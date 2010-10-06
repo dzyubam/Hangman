@@ -9,11 +9,17 @@
 from random import choice
 from re import match
 
+def readFile(path):
+    f = open(path, 'r')
+    r = map(lambda x: x.strip(), f.readlines())
+    f.close()
+    return r
+
 # lists of words
 
-animals = ['cat', 'panda', 'elephant', 'crocodile', 'dog', 'horse', 'cow', 'pig', 'giraffe', 'fox', 'wolf', 'bear', 'puma', 'jaguar', 'lion', 'hippopotamus', 'monkey', 'sheep', 'tiger', 'snake', 'whale', 'moose', 'rabbit', 'hare', 'camel', 'mouse', 'rat', 'deer', 'anaconda', 'hedgehog', 'groundhog', 'lizard', 'turtle']
-body = ['arm', 'hand', 'face', 'leg', 'nail', 'mouth', 'tooth', 'knuckle', 'elbow', 'finger', 'toe', 'hair', 'armpit', 'knee', 'foot', 'back', 'belly', 'chest', 'nose', 'jaw', 'eyelash', 'eyebrow', 'eyelid', 'ear', 'head', 'neck', 'buttocks', 'heel', 'wrist', 'lip', 'chin']
-fruits = ['apple', 'banana', 'pear', 'plum', 'apricot', 'orange', 'lemon', 'grapefruit', 'mango', 'tangerine', 'pineapple', 'peach', 'nectarine', 'fig', 'kiwi', 'avocado', 'papaya', 'feijoa', 'pomegranate', 'lime']
+animals = readFile("data/animals.txt")
+body    = readFile("data/body-parts.txt")
+fruits  = readFile("data/fruit.txt")
 
 charlist = []
 used_chars = []

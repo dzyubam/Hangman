@@ -24,10 +24,14 @@ fruits  = readFile("data/fruit.txt")
 charlist = []
 used_chars = []
 
+inLetter = ''
+
 #############
 # TODO list #
 ###############################################################################
-# provide support for custom lists (text file with words in a special format) #
+# Do you have a suggestion? Feel free to add a task here.
+#
+#
 ###############################################################################
 
 #
@@ -39,7 +43,7 @@ used_chars = []
 def getChoice(menu):
     print menu
     choice = raw_input("Make your choice: ")
-    print bool(choice)
+    choice = choice.lower()
     return choice
 
 # clearing a history 
@@ -94,13 +98,20 @@ def stars(word,char):
                 newWord = newWord.replace(newWord[i],'*')
     return newWord
 
+# get user input in lower-case
+
+def getLetter():
+    global inLetter
+    letter = raw_input('Enter your letter: ')
+    inLetter = letter.lower()
+
 # the main function -- handling user answers and communicating with him/her
 
 def mainFunc(cat):
-    global tries, wd, letters, used_chars, charlist
+    global tries, wd, letters, used_chars, charlist, inLetter
     init(cat)
     print "The word has %d letters. You have %d chances to guess wrong. Enter the letter: " % (letters, letters),
-    inLetter = raw_input()
+    getLetter()
 
     while (tries != 0):
         if (inLetter in wd) and (inLetter not in charlist):
@@ -114,20 +125,19 @@ def mainFunc(cat):
 |    You won!   |
 ================="""
                     starting()
-#                    break # testing...
                 else:
                     charlist.append(inLetter)
                     print "There is such letter in the word, congrats!"
                     print guessword
-                    inLetter = raw_input('Enter your letter: ')
+                    getLetter()
             else:
-                print "Please enter only one lower-case letter!"
-                inLetter = raw_input('Enter your letter: ')
+                print "Please enter one letter."
+                getLetter()
         if inLetter not in wd:
             if (not match('.{2,}', inLetter)) and (match('[a-z]{1}', inLetter)):
                 if inLetter in used_chars:
                     print "You already entered that letter. Try another one."
-                    inLetter = raw_input('Enter your letter: ')
+                    getLetter()
                 else:
                     tries -= 1
                     if (tries == 0):
@@ -138,17 +148,17 @@ def mainFunc(cat):
                     else:
                         print "Wrong! %d chances left." % tries
                         used_chars.append(inLetter)
-                        inLetter = raw_input('Enter your letter: ')
+                        getLetter()
             else:
-                print "Please enter only one lower-case letter!"
-                inLetter = raw_input('Enter your letter: ')
+                print "Please enter one letter."
+                getLetter()
         if (inLetter in wd) and (inLetter in charlist):
             if (not match('.{2,}', inLetter)) and (match('[a-z]{1}', inLetter)):
                 print "You already entered that letter. Try another one."
-                inLetter = raw_input('Enter your letter: ')
+                getLetter()
             else:
-                print "Please enter only one lower-case letter!"
-                inLetter = raw_input('Enter your letter: ')
+                print "Please enter one letter."
+                getLetter()
 
 # the entrance function, numeric menu
 

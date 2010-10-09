@@ -194,12 +194,19 @@ def chooseCategory(categories):
     print
     print "    (q) Quit"
     choice = getChoice("")
-    if choice != 'q':
+    choose_from = range(len(categories)+1)
+    del choose_from[0]
+    for i in range(len(choose_from)):
+        choose_from[i] = str(choose_from[i])
+    print choose_from
+    if choice in choose_from:
         n = int(choice) - 1
         if (n >= 0 and n < len(categories)):
             return categories[n]
-    else:
+    elif choice == 'q':
         bye()    
+    else:
+        starting()
 
 def starting():
     """The entry-point of the program."""

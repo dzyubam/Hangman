@@ -8,18 +8,7 @@
 
 from random import choice
 from re import match
-
-def readFile(path):
-    f = open(path, 'r')
-    r = map(lambda x: x.strip(), f.readlines())
-    f.close()
-    return r
-
-# lists of words
-
-animals = readFile("data/animals.txt")
-body    = readFile("data/body-parts.txt")
-fruits  = readFile("data/fruit.txt")
+import os
 
 charlist = []
 used_chars = []
@@ -53,36 +42,26 @@ def clearing():
     del charlist[:]
     del used_chars[:]
 
-# choosing a category, removing a used word, checking if the categories still have words in them
+def init(categories, category):
+    """
+    Chooses a category, removes a used word, checks if the categories
+    still have words in them.
 
-def init(cat):
-    global tries, letters, wd, animals, body, fruits
-    if ((len(animals) < 1) and (len(body) < 1) and (len(fruits) < 1)):
+    Type: Category list * Category -> unit
+    """
+    global tries, letters, wd
+    def isEmpty(cat):
+        return cat.isEmpty()
+    if (all(map(isEmpty, categories))):
         print "\nNo category has any words left. The program will quit now."
         bye()
-    if cat == 1:
-        if len(animals) >= 1:
-            wd = choice(animals)
-            del animals[animals.index(wd)]
-        else:
-            print "\nThis category doesn't have more words. Try another category."
-            starting()
-    elif cat == 2:
-        if len(body) >= 1:
-            wd = choice(body)
-            del body[body.index(wd)]
-        else:
-            print "\nThis category doesn't have more words. Try another category."
-            starting()
-    elif cat == 3:
-        if len(fruits) >= 1:
-            wd = choice(fruits)
-            del fruits[fruits.index(wd)]
-        else:
-            print "\nThis category doesn't have more words. Try another category."
-            starting()
-    tries = len(wd)
-    letters = len(wd)    
+    elif (category.isEmpty()):
+        print "\nThis category doesn't have more words. Try another category."
+        starting()        
+    else:
+        wd      = category.getWord()
+        tries   = len(wd)
+        letters = len(wd)
 
 def bye():
     print "\nBye! Play again soon.\n"
@@ -107,9 +86,9 @@ def getLetter():
 
 # the main function -- handling user answers and communicating with him/her
 
-def mainFunc(cat):
+def mainFunc(cats, cat):
     global tries, wd, letters, used_chars, charlist, inLetter
-    init(cat)
+    init(cats,cat)
     print "The word has %d letters. You have %d chances to guess wrong. Enter the letter: " % (letters, letters),
     getLetter()
 
@@ -160,36 +139,78 @@ def mainFunc(cat):
                 print "Please enter one letter."
                 getLetter()
 
-# the entrance function, numeric menu
+class Category:
+    """
+    Represents a category of notions.
+    """
+    def __init__(self, name, words):
+        self.name  = name
+        self.words = words
+
+    def isEmpty(self):
+        """Tests if the category is empty."""
+        return len(self.words) == 0
+
+    def getWord(self):
+        """
+        Picks a new random word and removes it from the category.
+        Type: unit -> string or None
+        """
+        if len(self.words) > 0:
+            wd = choice(self.words)
+            del self.words[self.words.index(wd)]
+            return wd
+
+def getCategories():
+    """
+    Discovers the categories from the data folder.
+    Type: unit -> Category list
+    """
+    def nameCategory(cat):
+        return cat.replace(".txt", "").replace("-"," ")
+    def readCategory(path):
+        f = open(path, 'r')
+        r = map(lambda x: x.strip(), f.readlines())
+        f.close()
+        return r
+    def getCategory(cat):
+        return Category(nameCategory(cat), readCategory('data/' + cat))
+    x = []
+    for (d, ds, fs) in os.walk('data'):
+        x = map(getCategory, fs)
+    return x
+
+def chooseCategory(categories):
+    """
+    Asks the user to choose a category. May exit the program.
+    Type: Category list -> Category or None
+    """
+    print "    Choose a category (or quit)"
+    print
+    i = 0
+    for x in categories:
+        i = i + 1
+        print "    (%i) %s" % (i, x.name)
+    print
+    print "    (q) Quit"
+    choice = getChoice("")
+    if choice != 'q':
+        n = int(choice) - 1
+        if (n >= 0 and n < len(categories)):
+            return categories[n]
+    else:
+        bye()    
 
 def starting():
+    """The entry-point of the program."""
     clearing()
-    menu = '''
-    Choose a category (or quit):
-
-    (1) Animals
-    (2) Body parts
-    (3) Fruits
-
-    (q) Quit
-    '''
-
-    choice = getChoice(menu)
-    if not (choice == ''):
-        while (choice):
-            if (choice == '1'):
-                mainFunc(1)
-            elif (choice == '2'):
-                mainFunc(2)
-            elif (choice == '3'):
-                mainFunc(3)
-            elif (choice == 'q'):
-                bye()
-            else:
-                print "\nEnter one of these: '1', '2', '3' or 'q'!\n"
-                choice = getChoice(menu)
-    else:
-        starting()
+    cats = getCategories()    
+    cat  = None
+    while cat == None:
+        cat = chooseCategory(cats)
+        if cat == None:
+            print "\nEnter one of these: '1', '2', '3' or 'q'!\n"
+    mainFunc(cats, cat)
 
 if __name__ == "__main__":
     starting()
